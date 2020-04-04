@@ -1,40 +1,84 @@
 #lang racket
-#|load("C:/Users/Smart/Desktop/2course/fp/lab3/plenary_register_mps-skl9(1).tsv")|#
-#|load("C:/Users/Smart/Desktop/2course/fp/lab3/mp-assistants(1).csv")|#
+
+(require "pretty-table.rkt")
+
+#|load("C:/Users/Smart/Desktop/2course/fp/lab3/plenary_register_mps-skl9.tsv")|#
+#|load("C:/Users/Smart/Desktop/2course/fp/lab3/mp-assistants.csv")|#
+
 
 
 (define command null)
 (define loadFile null)
 (define type null)
 (define input null)
-
-(define (table l)
-  (map (lambda (lst)
-         (~a "|" lst  #:min-width 20
-             #:max-width 20
-             #:limit-marker "..."))
-       l))
-
-(define (ReadCsv)
-  (map (lambda (l)
-       (table l))
-     (map (lambda (l)
-        (string-split l ","))
-    (file->lines loadFile))))
+(define index 0)
+(define FileList null)
+(define header null)
+(define tableByColumn (make-hash))
 
 
-(define (ReadTsv)
-  (map (lambda (l)
-       (table l))
-     (map (lambda (l)
-        (string-split l "\t"))
-    (file->lines loadFile))))
+#|||||||||||||||||||||||||||||||||Pretty Table|||||||||||||||||||||#
+
+#|(define (PrettyTableOutput tableR headerR)
+  (map (lambda (h)
+         (PrintRow (index-of header h) tableR headerR)
+        (display "\n"))
+       headerR))
+  
+ 
+
+(define (max-field-width table) (quotient 160 (hash-count table)))
+
+  
+(define (minWidthForField lst)
+  (first (sort (map (lambda (l)
+       (append (string-length l)))
+         lst) >)))
+
+(define (minWidth lst tableR)
+  (cond
+    ((>(minWidthForField lst) (max-field-width tableR)) (max-field-width tableR))
+    (#t (minWidthForField lst))))
+
+
+
+(define (PrintRow rowIndex tableR headerR)
+ (for ([i headerR])
+        (display (string-append "|" (~a (string-append (list-ref (hash-ref tableR i) rowIndex)) 
+                    #:max-width (max-field-width tableR)
+                    #:min-width (minWidth (hash-ref tableByColumn i) tableR)
+                    #:limit-marker "..."
+                    #:align 'center
+                    )  ))
+  ))|#
+
+
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
+
+
+
+
+
+(define (CreateTableByColumn table)
+  (set! index 0)
+  (for ([h header])
+    (hash-set! tableByColumn h (map (lambda (lst)
+                                      (append (list-ref lst index)))
+                                    FileList))
+    (set! index (+ index 1))))
+
+
+(define (listFromFile separator)
+(set! FileList (map (lambda (lst)
+       (string-split lst separator))
+       (file->lines loadFile)))
+  (set! header (first FileList)))
 
 
 (define (ReadFile)
   (cond
-    ((equal? type "csv") (ReadCsv))
-    ((equal? type "tsv") (ReadTsv))
+    ((equal? type "csv") (listFromFile ","))
+    ((equal? type "tsv") (listFromFile "\t"))
     (#t (println "error"))))
 
 
@@ -50,9 +94,12 @@
 
 
 (define (load)
+  
   (CheckFile)
   (GetType)
-  (ReadFile))
+  (ReadFile)
+  (CreateTableByColumn tableByColumn)
+  (PrettyTableOutput tableByColumn header))
   
 
 
@@ -72,3 +119,11 @@
     (#t (println "error"))))
 
 (run)
+
+
+
+
+
+
+
+

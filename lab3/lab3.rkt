@@ -16,49 +16,6 @@
 (define header null)
 (define tableByColumn (make-hash))
 
-
-#|||||||||||||||||||||||||||||||||Pretty Table|||||||||||||||||||||#
-
-#|(define (PrettyTableOutput tableR headerR)
-  (map (lambda (h)
-         (PrintRow (index-of header h) tableR headerR)
-        (display "\n"))
-       headerR))
-  
- 
-
-(define (max-field-width table) (quotient 160 (hash-count table)))
-
-  
-(define (minWidthForField lst)
-  (first (sort (map (lambda (l)
-       (append (string-length l)))
-         lst) >)))
-
-(define (minWidth lst tableR)
-  (cond
-    ((>(minWidthForField lst) (max-field-width tableR)) (max-field-width tableR))
-    (#t (minWidthForField lst))))
-
-
-
-(define (PrintRow rowIndex tableR headerR)
- (for ([i headerR])
-        (display (string-append "|" (~a (string-append (list-ref (hash-ref tableR i) rowIndex)) 
-                    #:max-width (max-field-width tableR)
-                    #:min-width (minWidth (hash-ref tableByColumn i) tableR)
-                    #:limit-marker "..."
-                    #:align 'center
-                    )  ))
-  ))|#
-
-
-#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||#
-
-
-
-
-
 (define (CreateTableByColumn table)
   (set! index 0)
   (for ([h header])

@@ -1,16 +1,23 @@
 #lang racket
 
+
 (provide PrettyTableOutput)
 
-(define (PrettyTableOutput tableR headerR)
-  (map (lambda (h)
-         (PrintRow (index-of headerR h) tableR headerR)
-        (display "\n"))
-       headerR))
-  
- 
+(define listInList '())
+(define count 0)
+(define index 0)
 
-(define (max-field-width table) (quotient 160 (hash-count table)))
+(define (PrettyTableOutput table header)
+  (set! count (length (hash-ref table (first header))))
+  (for ([i count])
+    (printRow header index table)
+    (display "\n")
+    (set! index (+ index 1)))
+ )
+
+
+(define (max-field-width header) (quotient 160 (length header)))
+
 
   
 (define (minWidthForField lst)
@@ -18,19 +25,20 @@
        (append (string-length l)))
          lst) >)))
 
-(define (minWidth lst tableR)
+(define (minWidth lst header)
   (cond
-    ((>(minWidthForField lst) (max-field-width tableR)) (max-field-width tableR))
-    (#t (minWidthForField lst))))
+    ((>(minWidthForField lst) (max-field-width header)) (max-field-width header))
+        (#t (minWidthForField lst))))
 
 
 
-(define (PrintRow rowIndex tableR headerR)
- (for ([i headerR])
-        (display (string-append "|" (~a (string-append (list-ref (hash-ref tableR i) rowIndex)) 
-                    #:max-width (max-field-width tableR)
-                    #:min-width (minWidth (hash-ref tableR i) tableR)
-                    #:limit-marker "..."
-                    #:align 'center
-                    )  ))
-  ))
+
+(define (printRow header index table)
+   (for ([i header])
+     (display (string-append "|" (~a (list-ref (hash-ref table i) index)
+                                     #:max-width (max-field-width header)
+                                     #:min-width (minWidth (hash-ref table i) header)
+                                     #:limit-marker "..."
+                                     #:align 'center)))))
+                                
+

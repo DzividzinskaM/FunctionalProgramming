@@ -3,7 +3,11 @@
 (require "select.rkt")
 (require "pretty-table.rkt")
 
-#|load("C:/Users/Smart/Desktop/2course/fp/lab3/plenary_register_mps-skl9.tsv")|#
+#|
+load("C:/Users/Smart/Desktop/2course/fp/lab3/plenary_register_mps-skl9.tsv")
+select distinct date_agenda, id_event from plenary_register_mps-skl9
+|#
+
 #|load("C:/Users/Smart/Desktop/2course/fp/lab3/mp-posts_full.csv")|#
 
 (define command null)

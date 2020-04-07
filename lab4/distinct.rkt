@@ -23,22 +23,4 @@
          (hash-set! table (first l) l))
        ListRows))
    
-  
-
-
-#|(define (CreateTableByRows table header)
-  (for ([i header])
-    (display (hash->list (hash-ref table i)))))|#
-
-
-
-
-  
-#|(define (CreateTableByRows table header)
-  (set! index 0)
-  (set! count (length (hash-ref table (first header))))
-  (set! ListRows (for ([i count])
-    (for ([j header])
-      (string-append (list-ref (hash-ref table j) index)))
-    (set! index (+ index 1))))
- )|#
+ 

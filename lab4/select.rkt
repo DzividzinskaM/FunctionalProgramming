@@ -2,12 +2,15 @@
 
 (require "pretty-table.rkt")
 (require "distinct.rkt")
+(require "where.rkt")
+
 (provide select)
 
 (define listColumn null)
 (define tableName null)
 (define table (make-hash))
 (define header null)
+(define selectLine null)
 
 (define (getColumn input from)
   (set! listColumn
@@ -56,27 +59,28 @@
   (set! listColumn (getColumn input 16)))
 
 
+
+
 (define (select input InTable name)
-  (display InTable)
-  (display "\n")
-  (set! tableName (getTableName input))
+  (cond
+    ((string-contains? input "where")  (set! selectLine (first (string-split input "where"))))
+    (#t (set! selectLine input)))
+  (set! tableName (getTableName selectLine))
   (checkExistTable name InTable)
-  (getHeader)
   (cond
-    ((equal? (substring input 7 15) "distinct" ) (getColumn input 16))
-    (#t   (getColumn input 6)))
+       ((string-contains? input "where") (where (string-normalize-spaces (second (string-split input "where"))) table)))
+       
+  (getHeader)  
+  (cond
+    ((string-contains? selectLine "distinct") (getColumn selectLine 16))
+    (#t   (getColumn selectLine 6)))
   (checkColumn)
-  (display InTable)
-  (display "\n")
   (getSelectTable)
-   (display InTable)
-  (display "\n")
   (cond
-    ((equal? (substring input 7 15) "distinct" ) (distinct table header)))
+    ((string-contains? selectLine "distinct") (distinct table header)))
   (PrettyTableOutput table listColumn)
 
-  ;(hash-clear! table)
-  ;(set! header '())
+
   )
 
 

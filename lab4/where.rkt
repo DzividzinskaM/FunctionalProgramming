@@ -49,6 +49,15 @@
   (set! ListRows (append (list (reverse header)) ListRows)))
 
 
+(define (ConditionNotEqual condition table)
+  (GetColumnAndValue condition "<>")
+  (set! ListRows (cddr ListRows))
+  (map (lambda (l)
+         (cond
+           ((equal? (list-ref l index) value) (set! ListRows (remove l ListRows)))))
+       ListRows)
+   (set! ListRows (append (list (reverse header)) ListRows)))  
+         
 
 (define (ConditionEqual condition table)
   (GetColumnAndValue condition "=")
@@ -62,6 +71,7 @@
 
 (define (getCondition condition table)
   (cond
+    ((string-contains? condition "<>") (ConditionNotEqual condition table))
     ((string-contains? condition ">=") (ConditionMoreEqual condition table))
     ((string-contains? condition "=") (ConditionEqual condition table))
     (#t (display "Operator don't find\n"))))

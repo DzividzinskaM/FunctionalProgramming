@@ -55,9 +55,6 @@
            (#t (hash-remove! table h))))
        header))
 
-;(define (GetCommandDistinct input)
- ; (set! listColumn (getColumn input 16)))
-
 
 
 

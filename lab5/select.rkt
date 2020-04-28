@@ -3,6 +3,7 @@
 (require "pretty-table.rkt")
 (require "distinct.rkt")
 (require "where.rkt")
+(require "orderby.rkt")
 
 (provide select)
 
@@ -56,12 +57,17 @@
        header))
 
 
+;(define getSelectLine
 
 
 (define (select input InTable name)
   (cond
-    ((string-contains? input "where")  (set! selectLine (first (string-split input "where"))))
-    (#t (set! selectLine input)))
+     ((string-contains? input "order by") (set! selectLine (first (string-split input "order by"))))
+     (#t (set! selectLine input)))
+  (cond
+    ((string-contains? input "where")  (set! selectLine (first (string-split input "where")))))
+  ;(#t (set! selectLine input)))
+ 
   (set! tableName (getTableName selectLine))
   (checkExistTable name InTable)
   (cond
@@ -70,6 +76,8 @@
   (cond
     ((string-contains? selectLine "distinct") (getColumn selectLine 16))
     (#t   (getColumn selectLine 6)))
+  (cond
+    ((string-contains? input "order by") (orderby table (second (string-split input "order by")))))
   (checkColumn)
   (getSelectTable)
   (cond

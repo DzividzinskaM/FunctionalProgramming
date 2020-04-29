@@ -4,6 +4,7 @@
 (require "distinct.rkt")
 (require "where.rkt")
 (require "orderby.rkt")
+(require "aggregateFunction.rkt")
 
 (provide select)
 
@@ -57,20 +58,8 @@
        header))
 
 
-;(define getSelectLine
-
-
-(define (select input InTable name)
-  (cond
-     ((string-contains? input "order by") (set! selectLine (first (string-split input "order by"))))
-     (#t (set! selectLine input)))
-  (cond
-    ((string-contains? input "where")  (set! selectLine (first (string-split input "where")))))
-  ;(#t (set! selectLine input)))
- 
-  (set! tableName (getTableName selectLine))
-  (checkExistTable name InTable)
-  (cond
+(define (doSelect input InTable name selectLine)
+   (cond
        ((string-contains? input "where") (where (string-normalize-spaces (second (string-split input "where"))) table)))       
   (getHeader)  
   (cond
@@ -82,7 +71,29 @@
   (getSelectTable)
   (cond
     ((string-contains? selectLine "distinct") (distinct table header)))
-  (PrettyTableOutput table listColumn)
-  )
+  (PrettyTableOutput table listColumn))
+
+
+
+(define aggregateFunctionLst '("count" "avg" "sum" "min"))
+(define aggFunc null)
+
+(define (select input InTable name)
+   (cond
+     ((string-contains? input "order by") (set! selectLine (first (string-split input "order by"))))
+     (#t (set! selectLine input)))
+  (cond
+    ((string-contains? input "where")  (set! selectLine (first (string-split input "where")))))
+  ;(#t (set! selectLine input)))
+  (set! tableName (getTableName selectLine))
+  (checkExistTable name InTable)
+  
+  (map (lambda (l)
+           (cond
+             ((string-contains? input l) (set! aggFunc l))))
+          aggregateFunctionLst)
+  (cond
+    ((null? aggFunc) (doSelect input InTable name selectLine))
+    (#t (aggregateFunction table selectLine aggFunc))))
 
 

@@ -66,9 +66,9 @@
 (define (GetCommand)
   (cond
     ((equal? input "") (println "String is empty"))
-    ((equal? (substring input 0 4) "exit") (set! command "exit"))
-    ((equal? (substring input 0 4) "load") (set! command "load"))
-    ((equal? (string-downcase (substring input 0 6)) "select") (set! command "select"))
+    ((string-contains? input "exit") (set! command "exit"))
+    ((string-contains? input "load") (set! command "load"))
+    ((string-contains? input "select")(set! command "select"))
     (#t (println "Command don't find"))))
 
 

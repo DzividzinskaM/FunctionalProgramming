@@ -73,8 +73,7 @@
   (cond
     ((hash-empty? table1) (set! table1 (hash-copy tableByColumn)))
      (#t (set! table2 (hash-copy tableByColumn)))) 
-  (println table1)
-  (println table2))
+)
   
 
 

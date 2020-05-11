@@ -90,7 +90,7 @@
   (cond
     ((string-contains? input "where")  (set! selectLine (first (string-split input "where")))))
   ;(#t (set! selectLine input)))
-    (println selectLine)
+    ;(println selectLine)
   (set! tableName (getTableName selectLine))
   (checkExistTable name InTable)
   

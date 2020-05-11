@@ -71,15 +71,50 @@
   (set! header (list  groupValue  aggValue))
   (set! resultRow (append (list header) resultRow))
   )
-              
-         
-         
+
+(define havingCond null)
+(define havingVal null)
+
+(define (doHaving line)
+  (set! havingCond (second (string-split (second (string-split line "having")) " ")))
+  (set! havingVal (string->number (third (string-split (second (string-split line "having")) " "))))
+  (map (lambda (l)
+         (set! lstForAgg null)
+             (map (lambda (k)
+                    (set! lstForAgg (append (list (list-ref localLstOfAgg k)) lstForAgg))
+                    )
+                   (indexes-of localLst l))
        
+         (doAggFun lstForAgg)
+         (set! p (list l (number->string out)))
+         (cond
+           ((equal? havingCond "=") (cond
+                                      ((equal? out havingVal) (set! resultRow (append resultRow (list p))))))
+           ((equal? havingCond ">") (cond
+                                      ((> out havingVal) (set! resultRow (append resultRow (list p))))))
+            ((equal? havingCond "<") (cond
+                                      ((< out havingVal) (set! resultRow (append resultRow (list p))))))
+            )       
+              )
+       localLst)
+  (set! resultRow (remove-duplicates resultRow))
+  (set! resultRow (cdr resultRow))
+  (set! header (list  groupValue  aggValue))
+  (set! resultRow (append (list header) resultRow))
+  )
+  
+         
+         
+(define selectLine "")       
         
 
 (define (groupBy line table)
-  (getValues line table)
-  (doGroupBy)
+   (cond
+    ((string-contains? line "having") (set! selectLine (first (string-split line " having")))))
+  (getValues selectLine table)
+  (cond
+    ((string-contains? line "having") (doHaving line))
+    (#t (doGroupBy)))  
   (set! header (car resultRow))
   (set! resultRow (transpose resultRow))
   (returnToTableByColumn result)

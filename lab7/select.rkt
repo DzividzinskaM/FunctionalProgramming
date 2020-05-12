@@ -6,6 +6,7 @@
 (require "orderby.rkt")
 (require "aggregateFunction.rkt")
 (require "groupBy.rkt")
+(require "case.rkt")
 
 (provide select)
 
@@ -59,7 +60,7 @@
        header))
 
 
-(define (doSelect input InTable name selectLine)
+(define (doSelect input InTable name selectLine line)
    (cond
        ((string-contains? input "where") (where (string-normalize-spaces (second (string-split input "where"))) table)))       
   (getHeader)  
@@ -72,7 +73,11 @@
   (getSelectTable)
   (cond
     ((string-contains? selectLine "distinct") (distinct table header)))
-  (PrettyTableOutput table listColumn))
+  (cond
+    ((string-contains? input "case") (case line table))
+    (#t (PrettyTableOutput table listColumn))))
+     
+  
 
 
 
@@ -82,8 +87,11 @@
 
 (define (select input InTable name)
   (cond
-    ((string-contains? input "group by") (set! selectLine (first (string-split input "group by"))))
-    (#t (set! selectLine input)))
+    ((string-contains? input "case") (set! selectLine (string-append (first (string-split input " case")) " from " (second (string-split input "from")))))
+     (#t (set! selectLine input)))
+  (cond
+    ((string-contains? input "group by") (set! selectLine (first (string-split selectLine "group by")))))
+   ; (#t (set! selectLine input)))
    (cond
      ((string-contains? input "order by") (set! selectLine (first (string-split selectLine "order by")))))
    ;  (#t (set! selectLine input)))
@@ -93,7 +101,8 @@
     ;(println selectLine)
   (set! tableName (getTableName selectLine))
   (checkExistTable name InTable)
-  
+
+ 
   (map (lambda (l)
            (cond
              ((string-contains? input l) (set! aggFunc l))))
@@ -101,7 +110,7 @@
 
   (cond
     ((string-contains? input "group by") (groupBy input InTable))
-    ((null? aggFunc) (doSelect input InTable name selectLine))
+    ((null? aggFunc) (doSelect input InTable name selectLine input))
     (#t (aggregateFunction table selectLine aggFunc aggOut)))
   )
 ;  (println aggOut))
